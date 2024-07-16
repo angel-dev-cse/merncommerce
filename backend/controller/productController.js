@@ -58,14 +58,7 @@ const getProduct = asyncHandler(async (req, res) => {
 // fetch all the products
 const getProducts = asyncHandler(async (req, res) => {
   try {
-    // could be done in this way but not efficient
-    // const products = await Product.find({
-    //   brand: req.query.brand,
-    //   color: req.query.color,
-    // });
-
     let query = { ...req.query };
-    console.log("Raw query", query);
 
     // this field shouldn't be used in parsing
     const excludeFields = ["page", "sort", "limit", "fields"];
@@ -82,6 +75,41 @@ const getProducts = asyncHandler(async (req, res) => {
 
     // convert appropriate fields into case insensitive regex
     query = caseIRegex(query);
+    console.log("Mongo Query:", query);
+
+    // get actual query to do sort, select and pagination
+    query = Product.find(query);
+
+    // sorting by fileds
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      // default sort by creation time
+      query = query.sort("createdAt");
+    }
+
+    // select fields
+    if (req.query.fields) {
+      const fields = req.query.fields.split(",").join(" ");
+      query = query.select(fields);
+    } else {
+      // don't show the mongoose's __v field (default)
+      query = query.select("-__v");
+    }
+
+    // pagination - default values (page:1, limit: 0)
+
+    const productCount = await Product.countDocuments();
+    const page = req.query?.page || 1;
+    const limit = req.query.limit || 0;
+    const skip = (page - 1) * limit;
+
+    if (skip >= productCount) {
+      throw new Error("Page does not exist!");
+    }
+
+    query = query.skip(skip).limit(limit);
 
     const products = await Product.find(query);
 
