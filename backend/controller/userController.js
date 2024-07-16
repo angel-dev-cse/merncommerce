@@ -131,7 +131,7 @@ const updateUser = asyncHandler(async (req, res) => {
 const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find();
   res.json(users);
-  });
+});
 
 const verifyToken = asyncHandler(async (req, res) => {
   // cookie parser should be enabled in index.js
@@ -161,6 +161,23 @@ const verifyToken = asyncHandler(async (req, res) => {
   });
 });
 
+// update password token
+const updatePassword = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const { password } = req.body;
+  validateMongoID(_id);
+
+  const user = await User.findById(_id);
+
+  if (password) {
+    user.password = password;
+    await user.save();
+    res.json("Password updated successfully!");
+  } else {
+    res.json("No password specified!");
+  }
+});
+
 const logoutUser = asyncHandler(async (req, res) => {
   const cookies = req.cookies;
 
@@ -185,9 +202,12 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   // reset the token to log the user out
   // --not using the returened value so {new:true} isn't being used
-  await User.findOneAndUpdate({token}, {
-    token: "",
-  });
+  await User.findOneAndUpdate(
+    { token },
+    {
+      token: "",
+    }
+  );
   res.clearCookie("token", {
     httpOnly: true,
     secure: true,
@@ -207,6 +227,7 @@ module.exports = {
   getAllUsers,
   blockUser,
   unblockUser,
+  updatePassword,
   logoutUser,
   verifyToken,
 };

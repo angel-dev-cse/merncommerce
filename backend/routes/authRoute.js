@@ -10,7 +10,8 @@ const {
   blockUser,
   unblockUser,
   verifyToken,
-  logoutUser
+  logoutUser,
+  updatePassword,
 } = require("../controller/userController");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 
@@ -19,6 +20,7 @@ router.post("/login", loginUser);
 router.get("/logout", logoutUser);
 router.get("/vToken", verifyToken);
 router.put("/update", authMiddleware, updateUser);
+router.put("/password", authMiddleware, updatePassword);
 router.get("/all-users", authMiddleware, isAdmin, getAllUsers);
 router.get("/:id", authMiddleware, isAdmin, getUser);
 router.put("/block/:id", authMiddleware, isAdmin, blockUser);
