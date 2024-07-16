@@ -1,6 +1,5 @@
 const express = require("express");
 const morgan = require("morgan");
-const slugify = require("slugify");
 const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
@@ -17,6 +16,7 @@ dbConnect();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+// see requests in bash?!
 app.use(morgan("dev"));
 
 app.use("/api/user", authRouter);

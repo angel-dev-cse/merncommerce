@@ -3,6 +3,13 @@
     {
       "splitTerminals": [
         {
+          "name": "git Push"
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
           "name": "server",
           "commands": ["cd backend/", "npm run server"]
         }
