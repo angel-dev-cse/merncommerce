@@ -65,4 +65,17 @@ const getProducts = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createProduct, getProduct, getProducts, updateProduct };
+// delete a product
+const deleteProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findByIdAndDelete(id);
+
+    res.json({ "Deleted Product": product });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+module.exports = { createProduct, getProduct, getProducts, updateProduct, deleteProduct };
