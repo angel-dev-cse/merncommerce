@@ -75,7 +75,7 @@ userSchema.methods.isPasswordMatched = function (enteredPassword) {
 };
 
 // generate reset password token
-const generateResetPasswordToken = (req, res) => {
+userSchema.methods.generateResetPasswordToken = async function() {
   const token = crypto.randomBytes(32).toString("hex");
   this.resetPasswordToken = crypto
     .createHash("sha256")

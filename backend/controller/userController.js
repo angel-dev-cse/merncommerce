@@ -1,8 +1,10 @@
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const User = require("../models/userModel");
 const validateMongoID = require("../utils/validateMongoID");
 const { generateToken, refreshToken } = require("../config/jwt");
+const { sendMail } = require("../controller/emailController");
 
 const createUser = asyncHandler(async (req, res) => {
   const email = req.body.email;
@@ -178,6 +180,68 @@ const updatePassword = asyncHandler(async (req, res) => {
   }
 });
 
+// request reset password
+const requestPasswordReset = asyncHandler(async (req, res) => {
+  // using the email find the user
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new Error("No valid user found!");
+  }
+
+  try {
+    // generate a temporary reset token using the fn in user model
+    const token = await user.generateResetPasswordToken();
+    // store it for checking later
+    await user.save();
+
+    const resetLink = `Hi! Please click <a href="http://localhost:5000/api/user/reset-password/${token}"><b>Reset Password</b></a> to reset your password.<div>This token will expire in <b>10</b> minutes!</div>`;
+
+    const data = {
+      to: email,
+      subject: "Reset MERNCOMMERCE password",
+      text: "Hello!",
+      html: resetLink,
+    };
+
+    sendMail(data);
+    res.json(token);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+// reset password
+const resetPassword = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  // find the user using the calculated hashed token
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetTokenExpiresIn: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new Error("Token expired! Please reqeust a new one.");
+  }
+
+  if (!password) {
+    throw new Error("Please enter a new password!");
+  }
+
+  console.log("Found user:", user);
+
+  user.password = password;
+  user.resetPasswordToken = undefined;
+  user.resetTokenExpiresIn = undefined;
+  await user.save();
+
+  res.json("Password reset successful!");
+});
+
 const logoutUser = asyncHandler(async (req, res) => {
   const cookies = req.cookies;
 
@@ -228,6 +292,8 @@ module.exports = {
   blockUser,
   unblockUser,
   updatePassword,
+  requestPasswordReset,
+  resetPassword,
   logoutUser,
   verifyToken,
 };

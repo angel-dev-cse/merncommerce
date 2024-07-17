@@ -12,11 +12,15 @@ const {
   verifyToken,
   logoutUser,
   updatePassword,
+  requestPasswordReset,
+  resetPassword
 } = require("../controller/userController");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 
 router.post("/register", createUser);
 router.post("/login", loginUser);
+router.post("/request-password-reset", requestPasswordReset);
+router.post("/reset-password/:token", resetPassword);
 router.get("/logout", logoutUser);
 router.get("/vToken", verifyToken);
 router.put("/update", authMiddleware, updateUser);
