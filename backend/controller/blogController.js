@@ -16,6 +16,8 @@ const createBlog = asyncHandler(async (req, res) => {
 const getBlog = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
+    validateMongoID(id);
+
     const blog = await Blog.findById(id);
     if (blog) res.status(200).json(blog);
   } catch (error) {
@@ -35,11 +37,17 @@ const getBlogs = asyncHandler(async (req, res) => {
 const deleteBlog = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedBlog = Blog.findByIdAndDelete(id);
-    res.status(200).json({ message: "Blog Deleted", deletedBlog });
+    validateMongoID(id);
+
+    const deletedBlog = await Blog.findByIdAndDelete(id);
+    if (deletedBlog) {
+      res.status(200).json({ message: "Blog Deleted", blog: deletedBlog });
+    } else {
+      throw new Error("Blog doesn't exist!");
+    }
   } catch (error) {
     throw new Error(error);
   }
 });
 
-module.exports = { createBlog, getBlog, getBlogs, deleteBlog};
+module.exports = { createBlog, getBlog, getBlogs, deleteBlog };

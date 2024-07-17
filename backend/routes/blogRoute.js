@@ -8,9 +8,9 @@ const {
 } = require("../controller/blogController");
 const router = express.Router();
 
-router.post("/", authMiddleware, isAdmin, createBlog);
 router.get("/:id", getBlog);
 router.get("/", getBlogs);
-router.delete("/:id", deleteBlog);
+router.post("/", authMiddleware, isAdmin, createBlog);
+router.delete("/:id", authMiddleware, isAdmin, deleteBlog);
 
 module.exports = router;
