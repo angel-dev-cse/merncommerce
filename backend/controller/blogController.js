@@ -50,4 +50,71 @@ const deleteBlog = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createBlog, getBlog, getBlogs, deleteBlog };
+const likeBlog = asyncHandler(async (req, res) => {
+  /* if "like" is clicked --
+  1) If already liked then remove the like
+  2) If already disliked then remove the dislike + add like */
+  try {
+    const { blogID } = req.body; // blog id
+    const { _id } = req?.user?._id; // logged in user id
+    validateMongoID(blogID);
+    validateMongoID(_id);
+
+    let blog = await Blog.findById(blogID);
+
+    const isLiked = blog?.likes?.some(
+      // userID is just temp value while iterating through values - returns Boolean
+      (userID => userID.toString() === _id.toString())
+    );
+
+    const isDisliked = blog?.dislikes?.some(
+      // userID is just temp value while iterating through values - returns Boolean
+      (userID => userID.toString() === _id.toString())
+    );
+
+    // if already disliked then remove the user from dislikes and add user to likes
+    if (isDisliked) {
+      let blog = await Blog.findByIdAndUpdate(
+        blogID,
+        {
+          $pull: { dislikes: _id },
+          isDisliked: false,
+          $push: { likes: _id },
+          isLiked: true,
+        },
+        { new: true }
+      );
+
+      res.json(blog);
+    }
+
+    // if already liked then remove the user from likes otherwise add the user to likes
+    if (isLiked) {
+      let blog = await Blog.findByIdAndUpdate(
+        blogID,
+        {
+          $pull: { likes: _id },
+          isLiked: false,
+        },
+        { new: true }
+      );
+
+      res.json(blog);
+    } else {
+      let blog = await Blog.findByIdAndUpdate(
+        blogID,
+        {
+          $push: { likes: _id },
+          isLiked: true,
+        },
+        { new: true }
+      );
+
+      res.json(blog);
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+module.exports = { createBlog, getBlog, getBlogs, deleteBlog, likeBlog };
