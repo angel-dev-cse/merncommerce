@@ -6,6 +6,7 @@ dotenv.config();
 const authRouter = require("./routes/authRoute.js");
 const productRouter = require("./routes/productRoute.js");
 const blogRouter = require("./routes/blogRoute.js");
+const productCategoryRouter = require("./routes/productCategoryRoute.js");
 const dbConnect = require("./config/dbConnect.js");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 
 app.use("/api/user", authRouter);
+app.use("/api/product/category", productCategoryRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
 

@@ -18,7 +18,7 @@ const getBlog = asyncHandler(async (req, res) => {
     const { id } = req.params;
     validateMongoID(id);
 
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findById(id).populate("likes").populate("dislikes");
     if (blog) res.status(200).json(blog);
   } catch (error) {
     throw new Error(error);
@@ -27,7 +27,7 @@ const getBlog = asyncHandler(async (req, res) => {
 
 const getBlogs = asyncHandler(async (req, res) => {
   try {
-    const blogs = await Blog.find();
+    const blogs = await Blog.find().populate("likes").populate("dislikes");
     if (blogs) res.status(200).json(blogs);
   } catch (error) {
     throw new Error(error);
