@@ -64,12 +64,12 @@ const likeBlog = asyncHandler(async (req, res) => {
 
     const isLiked = blog?.likes?.some(
       // userID is just temp value while iterating through values - returns Boolean
-      (userID => userID.toString() === _id.toString())
+      (userID) => userID.toString() === _id.toString()
     );
 
     const isDisliked = blog?.dislikes?.some(
       // userID is just temp value while iterating through values - returns Boolean
-      (userID => userID.toString() === _id.toString())
+      (userID) => userID.toString() === _id.toString()
     );
 
     // if already disliked then remove the user from dislikes and add user to likes
@@ -117,4 +117,65 @@ const likeBlog = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createBlog, getBlog, getBlogs, deleteBlog, likeBlog };
+const dislikeBlog = asyncHandler(async (req, res) => {
+  const { blogID } = req.body;
+  validateMongoID(blogID);
+  const { _id } = req.user._id;
+
+  let blog = await Blog.findById(blogID);
+
+  // check if user liked the blog already
+  // I forgot blog schema has isLiked and isDisliked variables maybe use those now
+  // this is more efficient when the blog has many likes or dislikes
+  // const isLiked = blog?.likes?.some(
+  //   (userID) => userID.toString() === _id.toString()
+  // );
+
+  // if not liked or disliked then add to dislike list
+  if (!blog.isLiked && !blog.isDisliked) {
+    let blog = await Blog.findByIdAndUpdate(
+      blogID,
+      {
+        $push: { dislikes: _id },
+        isDisliked: true,
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.json(blog);
+  } else if (blog.isLiked) {
+    // if liked already, then remove from the liked list and add to dislike list
+    let blog = await Blog.findByIdAndUpdate(
+      blogID,
+      {
+        $pull: { likes: _id },
+        $push: { dislikes: _id },
+        isLiked: false,
+        isDisliked: true,
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.json(blog);
+  } else {
+    // if disliked already, remove from dislikes
+    let blog = await Blog.findByIdAndUpdate(
+      blogID,
+      {
+        $pull: { dislikes: _id },
+        isDisliked: false,
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.json(blog);
+  }
+});
+
+module.exports = { createBlog, getBlog, getBlogs, deleteBlog, likeBlog, dislikeBlog };
