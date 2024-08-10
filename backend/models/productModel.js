@@ -56,6 +56,11 @@ var productSchema = new mongoose.Schema(
         },
       },
     ],
+    // average rating (floor - probably for showing the star count)
+    rating: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

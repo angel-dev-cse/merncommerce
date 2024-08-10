@@ -68,7 +68,7 @@ const getProducts = asyncHandler(async (req, res) => {
       delete query[field];
     });
 
-    // make the query object string in order to replace the number keys
+    // make the query object string in order to replace the number keys i.e. gte to $gte
     query = JSON.stringify(query);
 
     query = JSON.parse(
@@ -180,6 +180,79 @@ const addToWishlist = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc Rate a product
+const rateProduct = asyncHandler(async (req, res) => {
+  const { star, id } = req.body; // rating star and product ID
+  const { _id } = req.user; // user ID
+
+  validateMongoID(id);
+
+  let product = await Product.findById(id);
+
+  console.log(product.title);
+
+  // get the rating object if already rated
+  const rating = product?.ratings?.find(
+    (rating) => rating?.postedBy?.toString() === _id.toString()
+  );
+
+  if (rating) {
+    // update the rating - pull out the past one and push the new
+    // updateOne doesn't return the updated product so instead using findOneAndUpdate
+    // must provide the product ID as many product can have the same ratings by the same user
+    product = await Product.findOneAndUpdate(
+      {
+        _id: id,
+        ratings: { $elemMatch: rating },
+      },
+      {
+        // "ratings.$.star" refers to the first matched element (mongoDB operator $)
+        $set: { "ratings.$.star": star },
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: `You updated the ${product.title}'s rating with ${star} stars!`,
+    });
+  } else {
+    // add new rating
+    product = await Product.findByIdAndUpdate(
+      id,
+      {
+        $push: {
+          ratings: {
+            star: star,
+            postedBy: _id,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    res
+      .status(200)
+      .json({ message: `You rated the ${product.title} with ${star} stars!` });
+  }
+
+  // update the average rating at the same time
+  const totalRating = product?.ratings
+    ?.map((rating) => rating.star)
+    .reduce((total, curr) => total + curr);
+
+  const avgRating = Math.floor(totalRating / product.ratings.length);
+
+  product = await Product.findByIdAndUpdate(
+    id,
+    {
+      rating: avgRating,
+    },
+    { new: true }
+  );
+
+  console.log(product);
+});
+
 module.exports = {
   createProduct,
   getProduct,
@@ -187,4 +260,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   addToWishlist,
+  rateProduct,
 };
