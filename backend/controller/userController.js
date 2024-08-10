@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const User = require("../models/userModel");
-const validateMongoID = require("../utils/validateMongoID");
+const validateMongoID = require("../validations/validateMongoID");
 const { generateToken, refreshToken } = require("../config/jwt");
 const { sendMail } = require("../controller/emailController");
 

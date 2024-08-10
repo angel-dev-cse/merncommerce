@@ -3,7 +3,8 @@ const User = require("../models/userModel.js");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const { caseIRegex } = require("../utils/helper.js");
-const validateMongoID = require("../utils/validateMongoID.js");
+const validateMongoID = require("../validations/validateMongoID.js");
+const { productRatingSchema } = require("../validations/validationSchema.js");
 
 // create a product
 const createProduct = asyncHandler(async (req, res) => {
@@ -184,6 +185,10 @@ const addToWishlist = asyncHandler(async (req, res) => {
 const rateProduct = asyncHandler(async (req, res) => {
   // findByIdAndUpdate requires {runValidators: true} to run the mongoose validations!!!
   // updateOne bypasses validation
+  const { error } = productRatingSchema.validate(req.body);
+  if (error) {
+    res.status(400).json({ error: error.message });
+  }
   const { star, review, id } = req.body; // rating star and product ID
   const { _id } = req.user; // user ID
 
