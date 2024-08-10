@@ -182,14 +182,14 @@ const addToWishlist = asyncHandler(async (req, res) => {
 
 // @desc Rate a product
 const rateProduct = asyncHandler(async (req, res) => {
-  const { star, id } = req.body; // rating star and product ID
+  // findByIdAndUpdate requires {runValidators: true} to run the mongoose validations!!!
+  // updateOne bypasses validation
+  const { star, review, id } = req.body; // rating star and product ID
   const { _id } = req.user; // user ID
 
   validateMongoID(id);
 
   let product = await Product.findById(id);
-
-  console.log(product.title);
 
   // get the rating object if already rated
   const rating = product?.ratings?.find(
@@ -207,14 +207,10 @@ const rateProduct = asyncHandler(async (req, res) => {
       },
       {
         // "ratings.$.star" refers to the first matched element (mongoDB operator $)
-        $set: { "ratings.$.star": star },
+        $set: { "ratings.$.star": star, "ratings.$.review": review },
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
-
-    res.status(200).json({
-      message: `You updated the ${product.title}'s rating with ${star} stars!`,
-    });
   } else {
     // add new rating
     product = await Product.findByIdAndUpdate(
@@ -223,16 +219,13 @@ const rateProduct = asyncHandler(async (req, res) => {
         $push: {
           ratings: {
             star: star,
+            review: review,
             postedBy: _id,
           },
         },
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
-
-    res
-      .status(200)
-      .json({ message: `You rated the ${product.title} with ${star} stars!` });
   }
 
   // update the average rating at the same time
@@ -250,7 +243,10 @@ const rateProduct = asyncHandler(async (req, res) => {
     { new: true }
   );
 
-  console.log(product);
+  res.status(200).json({
+    message: `You rated the ${product.title} with ${star} stars!`,
+    product: product,
+  });
 });
 
 module.exports = {
