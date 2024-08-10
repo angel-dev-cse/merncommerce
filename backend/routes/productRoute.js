@@ -7,12 +7,14 @@ const {
   getProducts,
   updateProduct,
   deleteProduct,
+  addToWishlist,
 } = require("../controller/productController");
 
 router.post("/create", authMiddleware, isAdmin, createProduct);
 router.put("/:id", authMiddleware, isAdmin, updateProduct);
 router.get("/:id", authMiddleware, getProduct);
 router.get("/", authMiddleware, getProducts);
+router.post("/wish", authMiddleware, addToWishlist);
 router.delete("/:id", authMiddleware, isAdmin, deleteProduct);
 
 module.exports = router;
