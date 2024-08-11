@@ -3,10 +3,13 @@ const morgan = require("morgan");
 const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
+
 const authRouter = require("./routes/authRoute.js");
 const productRouter = require("./routes/productRoute.js");
 const blogRouter = require("./routes/blogRoute.js");
 const productCategoryRouter = require("./routes/productCategoryRoute.js");
+const couponRouter = require("./routes/couponRoute.js");
+
 const dbConnect = require("./config/dbConnect.js");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -25,6 +28,7 @@ app.use("/api/user", authRouter);
 app.use("/api/product/category", productCategoryRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
+app.use("/api/coupon", couponRouter);
 
 app.use(notFound);
 app.use(errorHandler);
