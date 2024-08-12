@@ -3,11 +3,17 @@ const User = require("../models/userModel.js");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const { caseIRegex } = require("../utils/helper.js");
+const { productSchema } = require("../validations/validationSchema.js");
 const validateMongoID = require("../validations/validateMongoID.js");
 const { productRatingSchema } = require("../validations/validationSchema.js");
 
 // create a product
 const createProduct = asyncHandler(async (req, res) => {
+  const { error } = productSchema.validate(req.body);
+  if (error) {
+    res.status(400).json({ error: error.message });
+  }
+
   // slug is shorthand for a single product (!)
   if (req.body.title) {
     req.body.slug = slugify(req.body.title, {

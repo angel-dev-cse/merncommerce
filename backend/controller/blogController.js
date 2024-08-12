@@ -197,11 +197,6 @@ const dislikeBlog = asyncHandler(async (req, res) => {
   }
 });
 
-const attachImage = asyncHandler(async (req, res) => {
-  console.log(req.params, req.body, req.files);
-  res.send("Ok");
-});
-
 module.exports = {
   createBlog,
   getBlog,
@@ -209,5 +204,4 @@ module.exports = {
   deleteBlog,
   likeBlog,
   dislikeBlog,
-  attachImage,
 };

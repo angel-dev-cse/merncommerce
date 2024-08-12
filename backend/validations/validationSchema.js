@@ -19,6 +19,14 @@ const blogSchema = Joi.object({
   category: Joi.string(),
 });
 
+const productSchema = Joi.object({
+  title: Joi.string().min(2).required(),
+  category: Joi.string().required(),
+  brand: Joi.string().required(),
+  color: Joi.string().required(),
+  price: Joi.number().integer().min(1).required(),
+  description: Joi.string().min(20).required(),
+});
 
 module.exports = {
   productRatingSchema,
