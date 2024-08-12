@@ -7,9 +7,9 @@ cloudinary.config({
   secure: true,
 })
 
-const uploadToCloudinary = async (filepath) => {
+const uploadToBlog = async (filepath) => {
   console.log("uploading");
   return await cloudinary.uploader.upload(filepath, { folder: "blog" });
 };
 
-module.exports = { uploadToCloudinary };
+module.exports = { uploadToBlog };

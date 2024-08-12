@@ -4,7 +4,7 @@ const fs = require("fs");
 const { blogSchema } = require("../validations/validationSchema");
 const validateMongoID = require("../validations/validateMongoID");
 const asyncHandler = require("express-async-handler");
-const { uploadToCloudinary } = require("../services/cloudinaryService");
+const { uploadToBlog } = require("../services/cloudinaryService");
 
 const createBlog = asyncHandler(async (req, res) => {
   console.log(req.body, req.files);
@@ -19,7 +19,7 @@ const createBlog = asyncHandler(async (req, res) => {
   let imgLinks = [];
 
   for (const file of req.files) {
-    const result = await uploadToCloudinary(file.path);
+    const result = await uploadToBlog(file.path);
     imgLinks.push(result.secure_url);
     fs.unlinkSync(file.path);
   }
@@ -30,7 +30,7 @@ const createBlog = asyncHandler(async (req, res) => {
     category,
     images: imgLinks,
   });
-  
+
   res.status(200).json(blog);
 });
 
@@ -55,19 +55,20 @@ const getBlogs = asyncHandler(async (req, res) => {
   }
 });
 
-const deleteBlog = asyncHandler(async (req, res) => {
-  try {
-    const { id } = req.params;
-    validateMongoID(id);
+// @TODO: Add updating blogs with image changing ability
 
-    const deletedBlog = await Blog.findByIdAndDelete(id);
-    if (deletedBlog) {
-      res.status(200).json({ message: "Blog Deleted", blog: deletedBlog });
-    } else {
-      throw new Error("Blog doesn't exist!");
-    }
-  } catch (error) {
-    throw new Error(error);
+// @DESC: Delete a blog
+// @ROUTE: DELETE /api/blog/:id
+// @ACCESS: Private
+const deleteBlog = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoID(id);
+
+  const deletedBlog = await Blog.findByIdAndDelete(id);
+  if (deletedBlog) {
+    res.status(200).json({ message: "Blog Deleted", blog: deletedBlog });
+  } else {
+    throw new Error("Blog doesn't exist!");
   }
 });
 
@@ -75,66 +76,62 @@ const likeBlog = asyncHandler(async (req, res) => {
   /* if "like" is clicked --
   1) If already liked then remove the like
   2) If already disliked then remove the dislike + add like */
-  try {
-    const { blogID } = req.body; // blog id
-    const { _id } = req?.user?._id; // logged in user id
-    validateMongoID(blogID);
-    validateMongoID(_id);
+  const { blogID } = req.body; // blog id
+  const { _id } = req?.user?._id; // logged in user id
+  validateMongoID(blogID);
+  validateMongoID(_id);
 
-    let blog = await Blog.findById(blogID);
+  let blog = await Blog.findById(blogID);
 
-    const isLiked = blog?.likes?.some(
-      // userID is just temp value while iterating through values - returns Boolean
-      (userID) => userID.toString() === _id.toString()
+  const isLiked = blog?.likes?.some(
+    // userID is just temp value while iterating through values - returns Boolean
+    (userID) => userID.toString() === _id.toString()
+  );
+
+  const isDisliked = blog?.dislikes?.some(
+    // userID is just temp value while iterating through values - returns Boolean
+    (userID) => userID.toString() === _id.toString()
+  );
+
+  // if already disliked then remove the user from dislikes and add user to likes
+  if (isDisliked) {
+    let blog = await Blog.findByIdAndUpdate(
+      blogID,
+      {
+        $pull: { dislikes: _id },
+        isDisliked: false,
+        $push: { likes: _id },
+        isLiked: true,
+      },
+      { new: true }
     );
 
-    const isDisliked = blog?.dislikes?.some(
-      // userID is just temp value while iterating through values - returns Boolean
-      (userID) => userID.toString() === _id.toString()
+    res.json(blog);
+  }
+
+  // if already liked then remove the user from likes otherwise add the user to likes
+  if (isLiked) {
+    let blog = await Blog.findByIdAndUpdate(
+      blogID,
+      {
+        $pull: { likes: _id },
+        isLiked: false,
+      },
+      { new: true }
     );
 
-    // if already disliked then remove the user from dislikes and add user to likes
-    if (isDisliked) {
-      let blog = await Blog.findByIdAndUpdate(
-        blogID,
-        {
-          $pull: { dislikes: _id },
-          isDisliked: false,
-          $push: { likes: _id },
-          isLiked: true,
-        },
-        { new: true }
-      );
+    res.json(blog);
+  } else {
+    let blog = await Blog.findByIdAndUpdate(
+      blogID,
+      {
+        $push: { likes: _id },
+        isLiked: true,
+      },
+      { new: true }
+    );
 
-      res.json(blog);
-    }
-
-    // if already liked then remove the user from likes otherwise add the user to likes
-    if (isLiked) {
-      let blog = await Blog.findByIdAndUpdate(
-        blogID,
-        {
-          $pull: { likes: _id },
-          isLiked: false,
-        },
-        { new: true }
-      );
-
-      res.json(blog);
-    } else {
-      let blog = await Blog.findByIdAndUpdate(
-        blogID,
-        {
-          $push: { likes: _id },
-          isLiked: true,
-        },
-        { new: true }
-      );
-
-      res.json(blog);
-    }
-  } catch (error) {
-    throw new Error(error);
+    res.json(blog);
   }
 });
 
