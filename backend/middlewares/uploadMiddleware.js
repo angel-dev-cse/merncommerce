@@ -8,7 +8,9 @@ if (!fs.existsSync("uploads/")) {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, `uploads/`); // temporary storage before uploading files to cloudinary
+    // temporary storage before uploading files to cloudinary
+    // we will reisze the images in this "uploads" folder
+    cb(null, `uploads/`);
   },
   filename: function (req, file, cb) {
     cb(
@@ -20,6 +22,18 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const filter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb({ message: "File type not supported" }, false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  filter: filter,
+  limits: { fileSize: 1000000 }, // Max 1MB image size
+});
 
 module.exports = { upload };
