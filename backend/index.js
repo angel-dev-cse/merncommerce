@@ -11,6 +11,7 @@ const productRouter = require("./routes/productRoute.js");
 const blogRouter = require("./routes/blogRoute.js");
 const productCategoryRouter = require("./routes/productCategoryRoute.js");
 const couponRouter = require("./routes/couponRoute.js");
+const cartRouter = require("./routes/cartRoute.js");
 
 const dbConnect = require("./config/dbConnect.js");
 const bodyParser = require("body-parser");
@@ -31,6 +32,7 @@ app.use("/api/product/category", productCategoryRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
 app.use("/api/coupon", couponRouter);
+app.use("/api/cart", cartRouter);
 
 app.use(notFound);
 app.use(errorHandler);

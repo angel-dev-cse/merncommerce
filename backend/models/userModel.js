@@ -36,10 +36,7 @@ var userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    cart: {
-      type: Array,
-      default: [],
-    },
+    cart: [],
     wishlist: [
       {
         type: mongoose.Schema.Types.ObjectId,

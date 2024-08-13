@@ -28,9 +28,16 @@ const productSchema = Joi.object({
   description: Joi.string().min(20).required(),
 });
 
+const cartSchema = Joi.object({
+  id: Joi.string().required(),
+  quantity: Joi.number().integer().min(1).required(),
+  color: Joi.string().required()
+})
+
 module.exports = {
   productRatingSchema,
   couponSchema,
   blogSchema,
-  productSchema
+  productSchema,
+  cartSchema,
 };
