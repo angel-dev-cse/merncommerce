@@ -149,6 +149,17 @@ const addAddress = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Address added successfully!", user: user });
 });
 
+const getWishlist = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongoID(_id);
+
+  const user = await User.findById(_id).populate("wishlist");
+
+  if (!user) throw new Error(`User not found with ID: ${id}`);
+
+  res.status(200).json(user.wishlist);
+});
+
 const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find();
   res.json(users);
@@ -309,6 +320,7 @@ module.exports = {
   updateUser,
   addAddress,
   getAllUsers,
+  getWishlist,
   blockUser,
   unblockUser,
   updatePassword,
