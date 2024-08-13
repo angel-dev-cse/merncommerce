@@ -45,6 +45,8 @@ const createProduct = asyncHandler(async (req, res) => {
   res.status(201).json(product);
 });
 
+
+// TODO : Adde image updating feature
 // update a single product
 const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
