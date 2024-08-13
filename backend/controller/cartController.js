@@ -51,4 +51,14 @@ const addToCart = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { addToCart };
+const getCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongoID(_id);
+
+  const cart = await Cart.findOne({ user: _id }).populate("products.id");
+  if (!cart) throw new Error("Cart not found!");
+
+  res.status(200).json(cart);
+});
+
+module.exports = { addToCart, getCart };
