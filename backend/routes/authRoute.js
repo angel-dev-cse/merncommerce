@@ -7,6 +7,7 @@ const {
   deleteUser,
   getAllUsers,
   updateUser,
+  addAddress,
   blockUser,
   unblockUser,
   verifyToken,
@@ -24,6 +25,7 @@ router.post("/reset-password/:token", resetPassword);
 router.get("/logout", logoutUser);
 router.get("/vToken", verifyToken);
 router.put("/update", authMiddleware, updateUser);
+router.post("/update-address", authMiddleware, addAddress);
 router.put("/password", authMiddleware, updatePassword);
 router.get("/all-users", authMiddleware, isAdmin, getAllUsers);
 router.get("/:id", authMiddleware, isAdmin, getUser);

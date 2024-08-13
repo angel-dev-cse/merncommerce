@@ -130,6 +130,25 @@ const updateUser = asyncHandler(async (req, res) => {
   res.json({ Message: "Successfully updated!", User: user });
 });
 
+const addAddress = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongoID(_id);
+
+  if (!req.body.address) {
+    return res.status(400).json({ message: "Address is required!" });
+  }
+
+  const user = await User.findByIdAndUpdate(
+    _id,
+    {
+      address: req?.body?.address,
+    },
+    { new: true }
+  );
+
+  res.status(200).json({ message: "Address added successfully!", user: user });
+});
+
 const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find();
   res.json(users);
@@ -288,6 +307,7 @@ module.exports = {
   getUser,
   deleteUser,
   updateUser,
+  addAddress,
   getAllUsers,
   blockUser,
   unblockUser,

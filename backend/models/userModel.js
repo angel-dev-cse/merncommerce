@@ -46,12 +46,9 @@ var userSchema = new mongoose.Schema(
         ref: "Product",
       },
     ],
-    address: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Address",
-      },
-    ],
+    address: {
+      type: String,
+    },
     token: {
       type: String,
     },
@@ -75,7 +72,7 @@ userSchema.methods.isPasswordMatched = function (enteredPassword) {
 };
 
 // generate reset password token
-userSchema.methods.generateResetPasswordToken = async function() {
+userSchema.methods.generateResetPasswordToken = async function () {
   const token = crypto.randomBytes(32).toString("hex");
   this.resetPasswordToken = crypto
     .createHash("sha256")
