@@ -7,10 +7,10 @@ const asyncHandler = require("express-async-handler");
 const createCoupon = asyncHandler(async (req, res) => {
   const { error } = couponSchema.validate(req.body);
 
-  if(req.body.type === "percentage" && req.body.discount > 100) {
+  if (req.body.type === "percentage" && req.body.discount > 100) {
     return res.status(400).json({ error: "Discount cannot be more than 100%" });
   }
-  
+
   if (error) {
     return res.status(400).json({ error: error.message });
   }
@@ -53,29 +53,9 @@ const deleteCoupon = asyncHandler(async (req, res) => {
   }
 });
 
-const applyCoupon = asyncHandler(async (req, res) => {
-  const { code } = req.body;
-  const coupon = await Coupon.findOne({
-    code,
-    expiryDate: { $gte: new Date() },
-  });
-
-  if (!coupon) {
-    return res.status(400).json({ error: "Coupon is not valid" });
-  }
-
-  const cart = await Cart.findOne({ user: req.user._id });
-  if (!cart) {
-    return res.status(400).json({ error: "Cart not found" });
-  }
-
-  const { totalPrice, discount } = cart;
-
-  if (coupon.type === "percentage") {
-    discount = (coupon.discount / 100) * totalPrice;
-  } else {
-    discount = coupon.discount;
-  }
-});
-
-module.exports = { createCoupon, getCoupons, deleteCoupon, updateCoupon };
+module.exports = {
+  createCoupon,
+  getCoupons,
+  deleteCoupon,
+  updateCoupon
+};

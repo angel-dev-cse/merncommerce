@@ -8,7 +8,7 @@ const productRatingSchema = Joi.object({
 });
 
 const couponSchema = Joi.object({
-  name: Joi.string().min(2).required(),
+  code: Joi.string().min(2).required(),
   type: Joi.string().valid("percentage", "fixed").required(),
   expiry: Joi.date().required(),
   discount: Joi.number().integer().min(1).required(),

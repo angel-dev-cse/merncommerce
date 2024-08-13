@@ -1,4 +1,5 @@
 const Cart = require("../models/cartModel");
+const Coupon = require("../models/couponModel");
 const Product = require("../models/productModel");
 const asyncHandler = require("express-async-handler");
 const validateMongoID = require("../validations/validateMongoID");
@@ -100,4 +101,64 @@ const removeFromCart = asyncHandler(async (req, res) => {
   res.json({ message: "Product removed from cart!", cart: cart });
 });
 
-module.exports = { addToCart, getCart, removeFromCart };
+// @desc   Empty cart
+// @route  DELETE /api/cart
+// @access Private
+// @role User
+// @validation _id
+const emptyCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongoID(_id);
+
+  const cart = await Cart.findOne({ user: _id });
+  if (!cart) throw new Error("Cart not found!");
+
+  cart.products = [];
+  cart.totalPrice = 0;
+  cart.discount = 0;
+  cart.appliedCoupon = null;
+
+  await cart.save();
+  res.json({ message: "Cart emptied!", cart: cart });
+});
+
+// @desc   Apply coupon
+// @route  POST /api/cart/coupon
+// @access Private
+// @role   User
+// @validation code
+const applyCoupon = asyncHandler(async (req, res) => {
+  const code = req.body.code.toUpperCase();
+  console.log(code);
+  const coupon = await Coupon.findOne({
+    code,
+  });
+
+  if (!coupon) {
+    return res.status(400).json({ error: "Coupon is not valid" });
+  }
+
+  const cart = await Cart.findOne({ user: req.user._id });
+  if (!cart) {
+    return res.status(400).json({ error: "Cart not found" });
+  }
+
+  let { totalPrice, discount, appliedCoupon } = cart;
+
+  if (appliedCoupon) {
+    return res.status(400).json({ error: "Coupon already applied" });
+  }
+
+  if (coupon.type === "percentage") {
+    discount = (coupon.discount / 100) * totalPrice;
+  } else {
+    discount = coupon.discount;
+  }
+
+  cart.discount = discount;
+  cart.appliedCoupon = coupon._id;
+  await cart.save();
+  res.status(200).json({ message: "Coupon applied successfully", cart });
+});
+
+module.exports = { addToCart, getCart, removeFromCart, emptyCart, applyCoupon };
