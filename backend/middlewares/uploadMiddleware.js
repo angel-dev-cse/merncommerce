@@ -2,10 +2,6 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("node:fs");
 
-if (!fs.existsSync("uploads/")) {
-  fs.mkdir("uploads/", { recursive: false });
-}
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // temporary storage before uploading files to cloudinary
@@ -33,7 +29,7 @@ const filter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   filter: filter,
-  limits: { fileSize: 1000000 }, // Max 1MB image size
+  limits: { fileSize: 5000000 }, // Max 1MB image size
 });
 
 module.exports = { upload };
