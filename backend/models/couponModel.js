@@ -8,6 +8,11 @@ var couponSchema = new mongoose.Schema({
     unique: true,
     uppercase: true,
   },
+  type: {
+    type: String,
+    required: true,
+    enum: ["percentage", "fixed"],
+  },
   expiry: {
     type: Date,
     required: true,
