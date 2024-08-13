@@ -1,5 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
+const fs = require("fs");
+const path = require("path");
 const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
@@ -32,6 +34,28 @@ app.use("/api/coupon", couponRouter);
 
 app.use(notFound);
 app.use(errorHandler);
+
+// Needed directories
+// __dirname = "";
+// const directories = [
+//   path.join(__dirname, "uploads"),
+//   path.join(__dirname, "uploads", "temp"),
+// ];
+// directories.forEach((dir) => {
+//   if (!fs.existsSync(dir)) {
+//     fs.mkdirSync(dir, { recursive: true, mode: 0o777 });
+//   }
+// });
+
+// const sharp = require('sharp');
+
+// sharp('C:/Users/PICK IT UP/Pictures/test.jpg')
+//   .resize(300, 300)
+//   .toFormat('jpeg')
+//   .jpeg({ quality: 90 })
+//   .toFile('uploads/output-image.jpg')
+//   .then(() => console.log('Processing complete'))
+//   .catch(err => console.error('Error:', err));
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

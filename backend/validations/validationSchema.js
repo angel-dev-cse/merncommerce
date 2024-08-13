@@ -31,5 +31,6 @@ const productSchema = Joi.object({
 module.exports = {
   productRatingSchema,
   couponSchema,
-  blogSchema
+  blogSchema,
+  productSchema
 };

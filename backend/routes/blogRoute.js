@@ -9,7 +9,6 @@ const {
   deleteBlog,
   likeBlog,
   dislikeBlog,
-  attachImage,
 } = require("../controller/blogController");
 const router = express.Router();
 
@@ -26,12 +25,12 @@ router.post(
 router.delete("/:id", authMiddleware, isAdmin, deleteBlog);
 router.put("/like", authMiddleware, likeBlog);
 router.put("/dislike", authMiddleware, dislikeBlog);
-router.post("/image", upload.array("images", 5), attachImage);
 
 module.exports = router;
 
 /*NOTE TO SELF
 uploadMiddleware uses multer to upload images to the server in /uploads folder
+"images" is the key in the form-data and 5 is the maximum number of images
 resizeMiddleware then resizes the images in /uploads/temp folder
 cloudinaryService then uploads the images to cloudinary (blog folder)
 blogController then saves the image URLs in the database

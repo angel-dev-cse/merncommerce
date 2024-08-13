@@ -1,11 +1,13 @@
 const Product = require("../models/productModel.js");
 const User = require("../models/userModel.js");
 const asyncHandler = require("express-async-handler");
+const fs = require("fs");
 const slugify = require("slugify");
 const { caseIRegex } = require("../utils/helper.js");
-const { productSchema } = require("../validations/validationSchema.js");
 const validateMongoID = require("../validations/validateMongoID.js");
+const { productSchema } = require("../validations/validationSchema.js");
 const { productRatingSchema } = require("../validations/validationSchema.js");
+const { uploadToProduct } = require("../services/cloudinaryService.js");
 
 // create a product
 const createProduct = asyncHandler(async (req, res) => {
@@ -22,12 +24,25 @@ const createProduct = asyncHandler(async (req, res) => {
       trim: true,
     });
   }
-  try {
-    const product = await Product.create(req.body);
-    res.json(product);
-  } catch (error) {
-    throw new Error(error);
+
+  let imageLinks = [];
+
+  if (req.files.length > 0) {
+    for (const file of req.files) {
+      const result = await uploadToProduct(file.path);
+      imageLinks.push(result.secure_url);
+
+      fs.unlinkSync(file.path);
+      fs.unlinkSync(file.parent_path);
+    }
+
+    req.body.images = imageLinks;
+  } else {
+    throw new Error("Must attach images!");
   }
+
+  const product = await Product.create(req.body);
+  res.status(201).json(product);
 });
 
 // update a single product

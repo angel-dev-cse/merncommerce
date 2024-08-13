@@ -39,7 +39,8 @@ const resizeProductImages = async (req, res, next) => {
       // MANDATORY: clear sharp cache
       sharp.cache(false);
 
-      //delete the original file only and only after the resizing is done
+      // will be used to remove images from //uploads and //uploads/temp folder
+      // in the controller
       file.parent_path = file.path;
       file.path = `uploads/temp/${file.filename}`;
     })

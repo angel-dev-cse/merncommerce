@@ -18,11 +18,13 @@ const createBlog = asyncHandler(async (req, res) => {
 
   let imgLinks = [];
 
-  for (const file of req.files) {
-    const result = await uploadToBlog(file.path);
-    imgLinks.push(result.secure_url);
-    fs.unlinkSync(file.parent_path);
-    fs.unlinkSync(file.path);
+  if (req.files.length > 0) {
+    for (const file of req.files) {
+      const result = await uploadToBlog(file.path);
+      imgLinks.push(result.secure_url);
+      if (file.parent_path) fs.unlinkSync(file.parent_path);
+      fs.unlinkSync(file.path);
+    }
   }
 
   const blog = await Blog.create({
