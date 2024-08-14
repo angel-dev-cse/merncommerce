@@ -24,7 +24,7 @@ const createOrder = asyncHandler(async (req, res) => {
   const { status, method, currency } = req.body.paymentIntent;
 
   const cart = await Cart.findOne({ user: _id });
-  if (!cart) throw new Error("Cart not found!");
+  if (cart?.products?.length <= 0) throw new Error("Cart is empty!");
 
   const order = new Order({
     products: cart.products,
