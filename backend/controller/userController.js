@@ -76,37 +76,31 @@ const deleteUser = asyncHandler(async (req, res) => {
 const blockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoID(id);
-  try {
-    const user = await User.findByIdAndUpdate(
-      id,
-      {
-        isBlocked: true,
-      },
-      { new: true }
-    );
 
-    res.json({ message: "User blocked!", user: user });
-  } catch (error) {
-    throw new Error(error);
-  }
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      isBlocked: true,
+    },
+    { new: true }
+  );
+
+  res.json({ message: "User blocked!", user: user });
 });
 
 const unblockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoID(id);
-  try {
-    const user = await User.findByIdAndUpdate(
-      id,
-      {
-        isBlocked: false,
-      },
-      { new: true }
-    );
 
-    res.json({ message: "User unblocked!", user: user });
-  } catch (error) {
-    throw new Error(error);
-  }
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      isBlocked: false,
+    },
+    { new: true }
+  );
+
+  res.json({ message: "User unblocked!", user: user });
 });
 
 const updateUser = asyncHandler(async (req, res) => {
@@ -220,26 +214,22 @@ const requestPasswordReset = asyncHandler(async (req, res) => {
     throw new Error("No valid user found!");
   }
 
-  try {
-    // generate a temporary reset token using the fn in user model
-    const token = await user.generateResetPasswordToken();
-    // store it for checking later
-    await user.save();
+  // generate a temporary reset token using the fn in user model
+  const token = await user.generateResetPasswordToken();
+  // store it for checking later
+  await user.save();
 
-    const resetLink = `Hi! Please click <a href="http://localhost:5000/api/user/reset-password/${token}"><b>Reset Password</b></a> to reset your password.<div>This token will expire in <b>10</b> minutes!</div>`;
+  const resetLink = `Hi! Please click <a href="http://localhost:5000/api/user/reset-password/${token}"><b>Reset Password</b></a> to reset your password.<div>This token will expire in <b>10</b> minutes!</div>`;
 
-    const data = {
-      to: email,
-      subject: "Reset MERNCOMMERCE password",
-      text: "Hello!",
-      html: resetLink,
-    };
+  const data = {
+    to: email,
+    subject: "Reset MERNCOMMERCE password",
+    text: "Hello!",
+    html: resetLink,
+  };
 
-    sendMail(data);
-    res.json(token);
-  } catch (error) {
-    throw new Error(error);
-  }
+  sendMail(data);
+  res.json(token);
 });
 
 // reset password

@@ -1,7 +1,10 @@
 const User = require("../models/userModel");
 const Blog = require("../models/blogModel");
 const fs = require("fs");
-const { validateMongoID, blogSchema } = require("../validations/validationSchema");
+const {
+  validateMongoID,
+  blogSchema,
+} = require("../validations/validationSchema");
 const asyncHandler = require("express-async-handler");
 const { uploadToBlog } = require("../services/cloudinaryService");
 
@@ -37,24 +40,16 @@ const createBlog = asyncHandler(async (req, res) => {
 });
 
 const getBlog = asyncHandler(async (req, res) => {
-  try {
-    const { id } = req.params;
-    validateMongoID(id);
+  const { id } = req.params;
+  validateMongoID(id);
 
-    const blog = await Blog.findById(id).populate("likes").populate("dislikes");
-    if (blog) res.status(200).json(blog);
-  } catch (error) {
-    throw new Error(error);
-  }
+  const blog = await Blog.findById(id).populate("likes").populate("dislikes");
+  if (blog) res.status(200).json(blog);
 });
 
 const getBlogs = asyncHandler(async (req, res) => {
-  try {
-    const blogs = await Blog.find().populate("likes").populate("dislikes");
-    if (blogs) res.status(200).json(blogs);
-  } catch (error) {
-    throw new Error(error);
-  }
+  const blogs = await Blog.find().populate("likes").populate("dislikes");
+  if (blogs) res.status(200).json(blogs);
 });
 
 // @TODO: Add updating blogs with image changing ability
