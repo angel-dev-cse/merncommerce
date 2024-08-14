@@ -29,6 +29,7 @@ router.put("/dislike", authMiddleware, dislikeBlog);
 module.exports = router;
 
 /*NOTE TO SELF
+CREATING BLOG with IMAGES
 uploadMiddleware uses multer to upload images to the server in /uploads folder
 "images" is the key in the form-data and 5 is the maximum number of images
 resizeMiddleware then resizes the images in /uploads/temp folder
