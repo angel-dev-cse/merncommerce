@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const {
   paymentSchema,
   paymentStatusSchema,
+  orderStatusSchema,
 } = require("../validations/validationSchema");
 const validateMongoID = require("../validations/validateMongoID");
 const uniqid = require("uniqid");
@@ -47,7 +48,7 @@ const createOrder = asyncHandler(async (req, res) => {
   cart.appliedCoupon = null;
   await cart.save();
 
-  res.json({ message: "Order created!", order: order });
+  res.status(201).json({ message: "Order created!", order: order });
 });
 
 // @desc    Get order
@@ -67,7 +68,7 @@ const getOrder = asyncHandler(async (req, res) => {
     throw new Error("Unauthorized access!");
   }
 
-  res.json({ order });
+  res.status(200).json({ order });
 });
 
 // @desc    Get orders
@@ -84,26 +85,32 @@ const getOrders = asyncHandler(async (req, res) => {
 });
 
 // @desc   Cancel order
-// @route  DELETE /api/order/:id
+// @route  PUT /api/order/:id/cancel
 // @access Private
 // @role   User
 // @validation _id, id
 const cancelOrder = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   validateMongoID(_id);
-  validateMongoID(req.params.id);
 
-  const order = await Order.findById(req.params.id);
+  const { id } = req.params;
+  validateMongoID(id);
+
+  const order = await Order.findById(id);
   if (!order) throw new Error("Order not found!");
 
-  if (order.user.toString() !== _id) {
+  if (order.user.toString() !== _id.toString()) {
     throw new Error("Unauthorized access!");
+  }
+
+  if (order.orderStatus === "Cancelled") {
+    return res.json({ message: "Order already cancelled!", order });
   }
 
   order.orderStatus = "Cancelled";
   await order.save();
 
-  res.json({ message: "Order cancelled!" });
+  res.status(201).json({ message: "Order cancelled!", order });
 });
 
 // @desc   Update order status
@@ -112,21 +119,23 @@ const cancelOrder = asyncHandler(async (req, res) => {
 // @role   Admin
 // @validation _id, id, orderStatus
 const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { error } = orderStatusSchema.validate(req.body);
+  if (error) {
+    return res.status(500).json({ message: error.message });
+  }
+
   const { _id } = req.user;
   validateMongoID(_id);
-  validateMongoID(req.params.id);
+  const { id } = req.params;
+  validateMongoID(id);
 
-  const order = await Order.findById(req.params.id);
+  const order = await Order.findById(id);
   if (!order) throw new Error("Order not found!");
-
-  if (order.user.toString() !== _id) {
-    throw new Error("Unauthorized access!");
-  }
 
   order.orderStatus = req.body.orderStatus;
   await order.save();
 
-  res.json({ message: "Order updated!" });
+  res.status(201).json({ message: `Order status updated to ${order.orderStatus}!`, order });
 });
 
 // @desc   Update payment status
@@ -144,6 +153,7 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
   validateMongoID(_id);
   const { id } = req.params;
   validateMongoID(id);
+  
   const { status } = req.body;
 
   const order = await Order.findById(id);
@@ -154,7 +164,7 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
 
   await order.save();
 
-  res.json({ message: "Payment status updated!" });
+  res.status(201).json({ message: "Payment status updated!", order });
 });
 
 module.exports = {

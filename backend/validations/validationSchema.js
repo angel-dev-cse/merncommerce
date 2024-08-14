@@ -54,6 +54,18 @@ const paymentSchema = Joi.object({
   }),
 });
 
+const orderStatusSchema = Joi.object({
+  orderStatus: Joi.string()
+    .valid(
+      "Not Processed",
+      "Processing",
+      "Dispatched",
+      "Cancelled",
+      "Completed"
+    )
+    .required(),
+});
+
 const paymentStatusSchema = Joi.object({
   status: Joi.string()
     .valid(
@@ -74,4 +86,6 @@ module.exports = {
   productSchema,
   cartSchema,
   paymentSchema,
+  orderStatusSchema,
+  paymentStatusSchema,
 };
