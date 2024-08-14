@@ -12,6 +12,7 @@ const blogRouter = require("./routes/blogRoute.js");
 const productCategoryRouter = require("./routes/productCategoryRoute.js");
 const couponRouter = require("./routes/couponRoute.js");
 const cartRouter = require("./routes/cartRoute.js");
+const orderRouter = require("./routes/orderRoute.js");
 
 const dbConnect = require("./config/dbConnect.js");
 const bodyParser = require("body-parser");
@@ -33,6 +34,7 @@ app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
 app.use("/api/coupon", couponRouter);
 app.use("/api/cart", cartRouter);
+app.use("/api/order", orderRouter);
 
 app.use(notFound);
 app.use(errorHandler);

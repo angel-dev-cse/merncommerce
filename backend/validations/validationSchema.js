@@ -32,8 +32,40 @@ const productSchema = Joi.object({
 const cartSchema = Joi.object({
   id: Joi.string().required(),
   quantity: Joi.number().integer().min(1).required(),
-  color: Joi.string().required()
-})
+  color: Joi.string().required(),
+});
+
+const paymentSchema = Joi.object({
+  paymentIntent: Joi.object({
+    status: Joi.string()
+      .valid(
+        "Pending",
+        "Processing",
+        "Completed",
+        "Failed",
+        "Cancelled",
+        "Refunded"
+      )
+      .required(),
+    method: Joi.string()
+      .valid("Cash on Delivery", "Card", "UPI", "Net Banking")
+      .required(),
+    currency: Joi.string().required(),
+  }),
+});
+
+const paymentStatusSchema = Joi.object({
+  status: Joi.string()
+    .valid(
+      "Pending",
+      "Processing",
+      "Completed",
+      "Failed",
+      "Cancelled",
+      "Refunded"
+    )
+    .required(),
+});
 
 module.exports = {
   productRatingSchema,
@@ -41,4 +73,5 @@ module.exports = {
   blogSchema,
   productSchema,
   cartSchema,
+  paymentSchema,
 };
