@@ -4,8 +4,7 @@ const asyncHandler = require("express-async-handler");
 const fs = require("fs");
 const slugify = require("slugify");
 const { caseIRegex } = require("../utils/helper.js");
-const validateMongoID = require("../validations/validateMongoID.js");
-const { productSchema } = require("../validations/validationSchema.js");
+const { validateMongoID, productSchema } = require("../validations/validationSchema.js");
 const { productRatingSchema } = require("../validations/validationSchema.js");
 const { uploadToProduct } = require("../services/cloudinaryService.js");
 

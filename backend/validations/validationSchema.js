@@ -1,4 +1,14 @@
 const Joi = require("joi");
+const mongoose = require("mongoose");
+
+// function to validate mongo id
+const validateMongoID = (id) => {
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+
+  if (!isValid) {
+    throw new Error("Mongoose error: Invalid ID");
+  }
+};
 
 // schema for validating product rating using JOI (server side)
 const productRatingSchema = Joi.object({
@@ -80,6 +90,7 @@ const paymentStatusSchema = Joi.object({
 });
 
 module.exports = {
+  validateMongoID,
   productRatingSchema,
   couponSchema,
   blogSchema,

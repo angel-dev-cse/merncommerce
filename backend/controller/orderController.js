@@ -2,11 +2,11 @@ const Order = require("../models/orderModel");
 const Cart = require("../models/cartModel");
 const asyncHandler = require("express-async-handler");
 const {
+  validateMongoID,
   paymentSchema,
   paymentStatusSchema,
   orderStatusSchema,
 } = require("../validations/validationSchema");
-const validateMongoID = require("../validations/validateMongoID");
 const uniqid = require("uniqid");
 
 // @desc    Create order
@@ -135,7 +135,9 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   order.orderStatus = req.body.orderStatus;
   await order.save();
 
-  res.status(201).json({ message: `Order status updated to ${order.orderStatus}!`, order });
+  res
+    .status(201)
+    .json({ message: `Order status updated to ${order.orderStatus}!`, order });
 });
 
 // @desc   Update payment status
@@ -153,7 +155,7 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
   validateMongoID(_id);
   const { id } = req.params;
   validateMongoID(id);
-  
+
   const { status } = req.body;
 
   const order = await Order.findById(id);

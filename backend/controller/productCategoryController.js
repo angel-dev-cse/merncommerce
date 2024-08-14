@@ -1,6 +1,6 @@
 const Category = require("../models/productCategoryModel");
 const asyncHandler = require("express-async-handler");
-const validateMongoID = require("../validations/validateMongoID");
+const { validateMongoID } = require("../validations/validationSchema");
 
 const createCategory = asyncHandler(async (req, res) => {
   const category = await Category.create(req.body);
@@ -43,4 +43,10 @@ const deleteCategory = asyncHandler(async (req, res) => {
   res.status(201).json({ message: "Delete successful!", category: category });
 });
 
-module.exports = { createCategory, getCategories, getCategory, updateCategory, deleteCategory };
+module.exports = {
+  createCategory,
+  getCategories,
+  getCategory,
+  updateCategory,
+  deleteCategory,
+};

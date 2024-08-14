@@ -2,8 +2,7 @@ const Cart = require("../models/cartModel");
 const Coupon = require("../models/couponModel");
 const Product = require("../models/productModel");
 const asyncHandler = require("express-async-handler");
-const validateMongoID = require("../validations/validateMongoID");
-const { cartSchema } = require("../validations/validationSchema");
+const { validateMongoID, cartSchema } = require("../validations/validationSchema");
 
 // @desc    Add product to cart or update quantity
 // @route   POST /api/cart

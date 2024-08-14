@@ -1,7 +1,6 @@
 const Coupon = require("../models/couponModel");
 const Cart = require("../models/cartModel");
-const validateMongoID = require("../validations/validateMongoID");
-const { couponSchema } = require("../validations/validationSchema");
+const { validateMongoID, couponSchema } = require("../validations/validationSchema");
 const asyncHandler = require("express-async-handler");
 
 const createCoupon = asyncHandler(async (req, res) => {

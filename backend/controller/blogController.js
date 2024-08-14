@@ -1,8 +1,7 @@
 const User = require("../models/userModel");
 const Blog = require("../models/blogModel");
 const fs = require("fs");
-const { blogSchema } = require("../validations/validationSchema");
-const validateMongoID = require("../validations/validateMongoID");
+const { validateMongoID, blogSchema } = require("../validations/validationSchema");
 const asyncHandler = require("express-async-handler");
 const { uploadToBlog } = require("../services/cloudinaryService");
 
