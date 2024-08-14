@@ -5,8 +5,8 @@ const { createOrder, getOrder, getOrders, cancelOrder, updateOrderStatus } = req
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 
 router.post("/", authMiddleware, createOrder);
-router.get("/", authMiddleware, getOrder);
-router.get("/:id", authMiddleware, getOrders);
+router.get("/", authMiddleware, getOrders);
+router.get("/:id", authMiddleware, getOrder);
 router.delete("/:id", authMiddleware, cancelOrder);
 router.put("/:id", authMiddleware, isAdmin, updateOrderStatus);
 

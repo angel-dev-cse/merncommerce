@@ -63,7 +63,7 @@ const getOrder = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) throw new Error("Order not found!");
 
-  if (order.user.toString() !== _id) {
+  if (order.user.toString() !== _id.toString()) {
     throw new Error("Unauthorized access!");
   }
 
